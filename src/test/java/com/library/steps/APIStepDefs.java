@@ -11,6 +11,9 @@ import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
+
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 
@@ -20,6 +23,7 @@ public class APIStepDefs {
     RequestSpecification givenPart;
     Response response;
     ValidatableResponse thenPart;
+    static String param;
 
     /**
      * US 01 RELATED STEPS
@@ -59,5 +63,36 @@ public class APIStepDefs {
         thenPart.body(path, everyItem(notNullValue()));
 
     }
+
+
+    /*
+            US 02
+     */
+
+    @Given("Path param is {string}")
+    public void path_param_is(String param) {
+
+        this.param = param;
+        givenPart.pathParam("id", param);
+
+    }
+    @Then("{string} field should be same with path param")
+    public void field_should_be_same_with_path_param(String path) {
+
+        String path1 = thenPart.extract().jsonPath().getString(path);
+
+        Assert.assertEquals(path1, param);
+
+    }
+    @Then("following fields should not be null")
+    public void following_fields_should_not_be_null(List<String> dataList) {
+
+        for (String eachField : dataList) {
+            thenPart.body(eachField, is(notNullValue()));
+        }
+
+    }
+
+
 
 }
